@@ -9,9 +9,50 @@ namespace refactor_me.test
     [TestClass]
     public class ProductsServiceTests
     {
-        #region Positive Tests
         [TestMethod]
-        public void GetAllProductsTest()
+        public void Test1_CreateProduct()
+        {
+            ProductsService productsService = new ProductsService();
+            Product input = new Product
+            {
+                Name = "Sony Xperia X Compact",
+                Description = "Snapdragon 650, 64-bit Hexa-core processor",
+                Price = (Decimal)699.99,
+                DeliveryPrice = (Decimal)25.00
+            };
+
+            productsService.CreateProduct(input);
+
+            var output = productsService.GetProductsByName("Sony Xperia X Compact");
+            Assert.IsNotNull(output);
+            Assert.AreEqual("Sony Xperia X Compact", output.Items[0].Name);
+        }
+
+        [TestMethod]
+        public void Test2_UpdateProduct()
+        {
+            ProductsService productsService = new ProductsService();
+            Products createdDetails = productsService.GetProductsByName("Sony Xperia X Compact");
+
+            Assert.IsNotNull(createdDetails);
+            Product input = new Product
+            {
+                Id = createdDetails.Items[0].Id,
+                Name = "Sony Xperia XA",
+                Description = "5-inch 720p edge-to-edge display with a slight curve",
+                Price = (Decimal)569.00,
+                DeliveryPrice = (Decimal)16.00,
+            };
+
+            productsService.UpdateProduct(input);
+
+            Products output = productsService.GetProductsByName("Sony Xperia XA");
+            Assert.IsNotNull(output);
+            Assert.AreEqual("Sony Xperia XA", output.Items[0].Name);
+        }
+
+        [TestMethod]
+        public void Test3_GetAllProductsTest()
         {
             var productsService = new ProductsService();
             var output = productsService.GetAllProducts();
@@ -19,79 +60,36 @@ namespace refactor_me.test
         }
 
         [TestMethod]
-        public void GetProductsByNameTest()
+        public void Test4_GetProductsByNameTest()
         {
-            var productsService = new ProductsService();
-            var output = productsService.GetProductsByName("Samsung");
+            ProductsService productsService = new ProductsService();
+            Products output = productsService.GetProductsByName("Sony Xperia XA");
             Assert.IsNotNull(output);
-            Assert.AreNotEqual(0, output.Items.Count);
+            Assert.AreEqual(1, output.Items.Count);
         }
 
         [TestMethod]
-        public void GetProductByIdTest()
+        public void Test5_GetProductByIdTest()
         {
-            var productsService = new ProductsService();
-            var output = productsService.GetProductById(new Guid("de1287c0-4b15-4a7b-9d8a-dd21b3cafec3"));
+            // Should return Apple iPhone 6S
+            ProductsService productsService = new ProductsService();
+            Product output = productsService.GetProductById(new Guid("de1287c0-4b15-4a7b-9d8a-dd21b3cafec3"));
             Assert.IsNotNull(output);
             Assert.AreEqual(new Guid("de1287c0-4b15-4a7b-9d8a-dd21b3cafec3"), output.Id);
         }
 
         [TestMethod]
-        public void CreateProductTest()
+        public void Test6_DeleteProductTest()
         {
-            var productsService = new ProductsService();
-            var input = new Product
-            {
-                Name = "Nokia",
-                Description = "Best phone ever",
-                Price = 14576.99M,
-                DeliveryPrice = 45.98M
-            };
-
-            productsService.CreateProduct(input);
-
-            var output = productsService.GetProductsByName("Nokia");
-            Assert.IsNotNull(output);
-            Assert.AreEqual("Nokia", output.Items[0].Name);
-        }
-
-        [TestMethod]
-        public void UpdateProductTest()
-        {
-            var productsService = new ProductsService();
-            var createdDetails = productsService.GetProductsByName("Nokia");
-
-            Assert.IsNotNull(createdDetails);
-            var input = new Product
-            {
-                Id = createdDetails.Items[0].Id,
-                Name = "Nokia 3310",
-                Description = "Best phone ever",
-                Price = 14576.99M,
-                DeliveryPrice = 45.98M
-            };
-
-            productsService.UpdateProduct(input);
-
-            var output = productsService.GetProductsByName("Nokia 3310");
-            Assert.IsNotNull(output);
-            Assert.AreEqual("Nokia 3310", output.Items[0].Name);
-        }
-
-        [TestMethod]
-        public void DeleteProductTest()
-        {
-            var productsService = new ProductsService();
-            var createdDetails = productsService.GetProductsByName("Nokia 3310");
+            ProductsService productsService = new ProductsService();
+            Products createdDetails = productsService.GetProductsByName("Sony Xperia XA");
 
             Assert.IsNotNull(createdDetails);
             productsService.DeleteProduct(createdDetails.Items[0].Id);
 
-            var output = productsService.GetProductById(createdDetails.Items[0].Id);
+            Product output = productsService.GetProductById(createdDetails.Items[0].Id);
             Assert.IsNull(output);
         }
-
-        #endregion
     }
 
 

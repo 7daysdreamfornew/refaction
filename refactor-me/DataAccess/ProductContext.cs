@@ -12,7 +12,7 @@ namespace refactor_me.DataAccess
     public partial class ProductContext : DbContext
     {
         public ProductContext()
-            : base("DBConnection")
+            : base("DBConnection2")
         {
         }
         
@@ -21,53 +21,10 @@ namespace refactor_me.DataAccess
    
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
-
-            //var rdrd = ExecuteReader(ProductOption.ToString());
-            //while (rdrd.Read())
-            //{
-            //    ProductOptions.Items.Add(MapOption(rdrd));
-            //}
-
-
-            //modelBuilder.Entity<Models.Product>()
-            //    .HasMany(e => e.ProductOptions)
-            //    .WithRequired(e => e.Product)
-            //    .WillCascadeOnDelete(false);
+            modelBuilder.Entity<Models.Product>()
+                .HasMany(e => e.ProductOptions)
+                .WithRequired(e => e.Product)
+                .WillCascadeOnDelete(false);
         }
-
-
-        public SqlDataReader ExecuteReader(String cmdString)
-        {
-            cmdString = cmdString.Replace("\r\n", "");
-
-            var conn = Helpers.NewConnection();
-            var cmd = new SqlCommand("$"+cmdString, conn);
-            conn.Open();
-
-            return cmd.ExecuteReader();
-        }
-
-        public void ExecuteNonQuery(String cmdString)
-        {
-            var conn = Helpers.NewConnection();
-            var cmd = new SqlCommand(cmdString, conn);
-
-            conn.Open();
-            cmd.ExecuteNonQuery();
-            conn.Close();
-        }
-
-        protected ProductOption MapOption(SqlDataReader rdr)
-        {
-            return new ProductOption
-            {
-                Id = Guid.Parse(rdr["Id"].ToString()),
-                ProductId = Guid.Parse(rdr["ProductId"].ToString()),
-                Name = rdr["Name"].ToString(),
-                Description = (DBNull.Value == rdr["Description"]) ? null : rdr["Description"].ToString()
-            };
-        }
-
-
     }
 }

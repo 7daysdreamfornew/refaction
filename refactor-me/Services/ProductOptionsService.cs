@@ -26,7 +26,7 @@ namespace refactor_me.Services
         public ProductOptions GetProductOptionsByProductId(Guid productId)
         {
             try
-            {
+            {                
                 List<ProductOption> options = db.ProductOptions.Where(o => o.ProductId == productId).ToList();
                 return new ProductOptions(options);
             }
@@ -37,15 +37,34 @@ namespace refactor_me.Services
         }
         public ProductOption GetProductOptionById(Guid productId, Guid id)
         {
-            return db.ProductOptions.FirstOrDefault(o => o.Id == id && o.ProductId == productId);
+            try
+            {
+                ProductOption productOption = db.ProductOptions.FirstOrDefault(o => o.Id == id && o.ProductId == productId);
+                return productOption;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+            
         }
+
         public ProductOption GetProductOptionById(Guid id)
         {
-            return db.ProductOptions.FirstOrDefault(o => o.Id == id);
+            try
+            {
+                ProductOption productOption = db.ProductOptions.FirstOrDefault(o => o.Id == id);
+                return productOption;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
         }
+
         public void CreateOption(Guid productId, ProductOption option)
         {
-            var orig = new ProductOption()
+            ProductOption orig = new ProductOption()
             {
                 ProductId = productId,
                 Name = option.Name,
@@ -78,13 +97,27 @@ namespace refactor_me.Services
                 Description = option.Description
             };
 
-            orig.Save();       
+
+            ProductOption optionToUpdate = GetProductOptionById(option.Id);
+            if (optionToUpdate != null)
+            {
+                db.Entry(optionToUpdate).CurrentValues.SetValues(orig);
+            }
+
+            db.Entry(optionToUpdate).State = System.Data.Entity.EntityState.Modified;
+
+            db.SaveChanges();
         }
 
         public void DeleteOption(Guid id)
         {
-            var opt = new ProductOption(id);
-            opt.Delete();
+            ProductOption option = GetProductOptionById(id);
+            if (option != null)
+            {
+                //db.Set<ProductOption>().Remove(option);
+                db.Entry(option).State = System.Data.Entity.EntityState.Deleted;
+                db.SaveChanges();
+            }
         }
         
         protected void Dispose(bool disposing)

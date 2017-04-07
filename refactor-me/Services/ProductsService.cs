@@ -13,30 +13,12 @@ namespace refactor_me.Services
     {
         private ProductContext db = new ProductContext();
 
-        protected Product MapProduct(SqlDataReader rdr)
-        {
-            return new Product
-            {
-                Id = Guid.Parse(rdr["Id"].ToString()),
-                Name = rdr["Name"].ToString(),
-                Description = (DBNull.Value == rdr["Description"]) ? null : rdr["Description"].ToString(),
-                Price = decimal.Parse(rdr["Price"].ToString()),
-                DeliveryPrice = decimal.Parse(rdr["DeliveryPrice"].ToString())
-            };
-        }
-
         public Products GetAllProducts()
         {
             try
             {
                 List<Product> products = new List<Product>();
-                IQueryable<Product> test = db.Products.Select(x => x);
-
-                var rdr = db.ExecuteReader(db.Products.ToString());
-                while (rdr.Read())
-                {
-                    products.Add(MapProduct(rdr));
-                }
+                products = db.Products.ToList();
                 return new Products(products);
             }
             catch (Exception)
@@ -65,24 +47,40 @@ namespace refactor_me.Services
 
         public void UpdateProduct(Product product)
         {
-            var orig = new Product(product.Id)
+            Product orig = new Product(product.Id)
             {
                 Name = product.Name,
                 Description = product.Description,
                 Price = product.Price,
                 DeliveryPrice = product.DeliveryPrice
             };
-            orig.Save();
+
+            Product prodToUpdate = GetProductById(product.Id);
+
+            if (prodToUpdate != null)
+            {
+                db.Entry(prodToUpdate).CurrentValues.SetValues(orig);
+            }
+
+            db.Entry(prodToUpdate).State = System.Data.Entity.EntityState.Modified;
+            
+            db.SaveChanges();
         }
 
         public void DeleteProduct(Guid id)
         {
-            var product = new Product(id);
-            product.Delete();
+            Product product = GetProductById(id);
+            if(product != null)
+            {
+                //db.Set<Product>().Remove(product);
+                db.Entry(product).State = System.Data.Entity.EntityState.Deleted;
+                db.SaveChanges();
+            }
         }
 
         public void CreateProduct(Product product)
         {
+            product.Id = Guid.NewGuid();
             db.Products.Add(product);
             db.SaveChanges();
         }

@@ -19,8 +19,6 @@ namespace refactor_me.Models
         public decimal DeliveryPrice { get; set; }
 
         public virtual ICollection<ProductOption> ProductOptions { get; set; }
-        //[JsonIgnore]
-        //public bool IsNew { get; }
 
         public Product()
         {

@@ -10,31 +10,33 @@ namespace refactor_me.test
     public class ProductOptionsServiceTests
     {
         [TestMethod]
-        public void GetProductOptionsByProductIdTest()
+        public void Test7_GetProductOptionByIdTest()
         {
-            var productOptionsService = new ProductOptionsService();
-            var output = productOptionsService.GetProductOptionsByProductId(new Guid("de1287c0-4b15-4a7b-9d8a-dd21b3cafec3"));
+            // iphone gold
+            ProductOptionsService productOptionsService = new ProductOptionsService();
+            ProductOption output = productOptionsService.GetProductOptionById(new Guid("5c2996ab-54ad-4999-92d2-89245682d534"));
+            Assert.IsNotNull(output);
+            Assert.AreEqual(new Guid("5c2996ab-54ad-4999-92d2-89245682d534"), output.Id);
+        }
+
+        [TestMethod]
+        public void Test8_GetProductOptionsByProductIdTest()
+        {            
+            ProductOptionsService productOptionsService = new ProductOptionsService();
+            // iPhone options to find
+            ProductOptions output = productOptionsService.GetProductOptionsByProductId(new Guid("de1287c0-4b15-4a7b-9d8a-dd21b3cafec3"));
             Assert.IsNotNull(output);
             Assert.AreNotEqual(0, output.Items.Count);
         }
-
+        
         [TestMethod]
-        public void GetProductOptionByIdTest()
+        public void Test9_CreateProductOptionTest()
         {
-            var productOptionsService = new ProductOptionsService();
-            var output = productOptionsService.GetProductOptionById(new Guid("9ae6f477-a010-4ec9-b6a8-92a85d6c5f03"));
-            Assert.IsNotNull(output);
-            Assert.AreEqual(new Guid("9ae6f477-a010-4ec9-b6a8-92a85d6c5f03"), output.Id);
-        }
+            ProductsService productsService = new ProductsService();
+            Products createdDetails = productsService.GetProductsByName("Samsung Galaxy S7");
 
-        [TestMethod]
-        public void CreateProductOptionTest()
-        {
-            var productsService = new ProductsService();
-            var createdDetails = productsService.GetProductsByName("Samsung");
-
-            var productOptionsService = new ProductOptionsService();
-            var input = new ProductOption
+            ProductOptionsService productOptionsService = new ProductOptionsService();
+            ProductOption input = new ProductOption
             {
                 ProductId = createdDetails.Items[0].Id,
                 Name = "Rose Gold",
@@ -43,47 +45,50 @@ namespace refactor_me.test
 
             productOptionsService.CreateOption(input);
 
-            var output = productOptionsService.GetProductOptionsByProductId(createdDetails.Items[0].Id);
+            ProductOptions output = productOptionsService.GetProductOptionsByProductId(createdDetails.Items[0].Id);
             Assert.IsNotNull(output);
             Assert.AreEqual(createdDetails.Items[0].Id, output.Items[0].ProductId);
         }
 
         [TestMethod]
-        public void UpdateProductOptionTest()
+        public void Test10_UpdateProductOptionTest()
         {
-            var productsService = new ProductsService();
-            var createdProductDetails = productsService.GetProductsByName("Nokia 3310");
+            ProductsService productsService = new ProductsService();
+            Products createdProductDetails = productsService.GetProductsByName("Samsung Galaxy S7");
 
-            var productOptionsService = new ProductOptionsService();
-            var createdProductOptionDetails = productOptionsService.GetProductOptionsByProductId(createdProductDetails.Items[0].Id);
+            ProductOptionsService productOptionsService = new ProductOptionsService();
+            ProductOptions createdProductOptionDetails = productOptionsService.GetProductOptionsByProductId(createdProductDetails.Items[0].Id);
 
-            var input = new ProductOption
+            // Update first option
+            ProductOption input = new ProductOption
             {
                 Id = createdProductOptionDetails.Items[0].Id,
                 ProductId = createdProductOptionDetails.Items[0].ProductId,
-                Name = "White",
-                Description = "White Apple"
+                Name = "Red",
+                Description = "Red Samsung"
             };
 
             productOptionsService.UpdateOption(input);
 
-            var output = productOptionsService.GetProductOptionById(createdProductOptionDetails.Items[0].Id);
+            ProductOption output = productOptionsService.GetProductOptionById(createdProductOptionDetails.Items[0].Id);
             Assert.IsNotNull(output);
+            // Should fail the test here
             Assert.AreEqual("White", output.Name);
         }
 
         [TestMethod]
-        public void DeleteProdutOptionTest()
+        public void Test11_DeleteProdutOptionTest()
         {
-            var productsService = new ProductsService();
-            var createdProductDetails = productsService.GetProductsByName("Nokia 3310");
+            ProductsService productsService = new ProductsService();
+            Products createdProductDetails = productsService.GetProductsByName("Samsung Galaxy S7");
 
-            var productOptionsService = new ProductOptionsService();
-            var createdProductOptionDetails = productOptionsService.GetProductOptionsByProductId(createdProductDetails.Items[0].Id);
+            ProductOptionsService productOptionsService = new ProductOptionsService();
+            ProductOptions createdProductOptionDetails = productOptionsService.GetProductOptionsByProductId(createdProductDetails.Items[0].Id);
 
+            // Delete the first option
             productOptionsService.DeleteOption(createdProductOptionDetails.Items[0].Id);
 
-            var output = productOptionsService.GetProductOptionsByProductId(createdProductOptionDetails.Items[0].Id);
+            ProductOptions output = productOptionsService.GetProductOptionsByProductId(createdProductOptionDetails.Items[0].Id);
             Assert.IsNull(output);
         }
     }
