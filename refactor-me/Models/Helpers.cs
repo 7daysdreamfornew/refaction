@@ -1,6 +1,8 @@
-﻿using System.Configuration;
+﻿using System;
+using System.Configuration;
 using System.Data.SqlClient;
 using System.Web;
+using System.Web.Configuration;
 
 namespace refactor_me.Models
 {
@@ -10,15 +12,8 @@ namespace refactor_me.Models
 
         public static SqlConnection NewConnection()
         {
-           var connstr = ConnectionString.Replace("{DataDirectory}", HttpContext.Current.Server.MapPath("~/App_Data"));
+            var connstr = ConnectionString.Replace("{DataDirectory}", HttpContext.Current.Server.MapPath("~/App_Data"));
             return new SqlConnection(connstr);
         }
-
-        //public static string ConnectionString()
-        //{
-
-        //    return ConfigurationManager.ConnectionStrings[0].ToString().Replace("{DataDirectory}", HttpContext.Current.Server.MapPath("~/App_Data"));
-
-        //}
     }
 }

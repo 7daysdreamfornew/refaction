@@ -12,7 +12,7 @@ namespace refactor_me.DataAccess
     public partial class ProductContext : DbContext
     {
         public ProductContext()
-            : base("DBConnection2")
+            : base("DBConnection")
         {
         }
         
